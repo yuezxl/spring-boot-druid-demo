@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="OFF" monitorInterval="1800">
+	<properties>
+		<property name="LOG_HOME">/export/Logs/spring-boot-druid-demo</property>
+		<!-- 日常INFO级别日志 -->
+		<property name="RUNNING_FILE_NAME">spring-boot-druid-demo</property>
+		<!-- 错误日志 -->
+		<property name="ERROR_FILE_NAME">spring-boot-druid-demo-error</property>
+	</properties>
+
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+			<PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss.SSS} [%t] %-5level %class{36} [%L] [%M] - %msg%xEx%n" />
+			                                                                       <!--  %logger{36} - %msg%n -->
+		</Console>
+
+		<RollingRandomAccessFile name="RUNNING-LOG" fileName="${LOG_HOME}/${RUNNING_FILE_NAME}.log" filePattern="${LOG_HOME}/${RUNNING_FILE_NAME}_%d{yyyy-MM-dd}_%i.log">
+			<ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+			<PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss.SSS} [%t] %-5level %class{36} [%L] [%M] - %msg%xEx%n" />
+			<Policies>
+				<!-- interval，integer型，指定两次封存动作之间的时间间隔。单位:以日志的命名精度来确定单位，比如yyyy-MM-dd-HH 单位为小时，yyyy-MM-dd-HH-mm 单位为分钟
+					modulate，boolean型，说明是否对封存时间进行调制。若modulate=true，则封存时间将以0点为边界进行偏移计算。比如，modulate=true，interval=4hours，那么假设上次封存日志的时间为03:00，则下次封存日志的时间为04:00，之后的封存时间依次为08:00，12:00，16:00，。。。 -->
+				<TimeBasedTriggeringPolicy modulate="true" interval="24" />
+				<SizeBasedTriggeringPolicy size="51200 KB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+
+		<RollingRandomAccessFile name="ERROR-LOG" fileName="${LOG_HOME}/${ERROR_FILE_NAME}.log" filePattern="${LOG_HOME}/${ERROR_FILE_NAME}_%d{yyyy-MM-dd}_%i.log">
+			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+			<PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss.SSS} [%t] %-5level %class{36} [%L] [%M] - %msg%xEx%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true" interval="24" />
+				<SizeBasedTriggeringPolicy size="51200 KB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingRandomAccessFile>
+	</Appenders>
+
+	<Loggers>
+		<!-- 异步日志 -->
+		<AsyncRoot level="INFO" includeLocation="true">
+			<appender-ref ref="Console" />
+			<appender-ref ref="RUNNING-LOG" />
+			<appender-ref ref="ERROR-LOG" />
+		</AsyncRoot>
+	</Loggers>
+</Configuration>
